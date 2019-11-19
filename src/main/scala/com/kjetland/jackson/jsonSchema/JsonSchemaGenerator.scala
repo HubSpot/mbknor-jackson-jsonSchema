@@ -685,6 +685,10 @@ class JsonSchemaGenerator
           }
       }
 
+      // Set format for java Longs to int64
+      if (_type.getRawClass.getName.equals(classOf[java.lang.Long].getName)) {
+        setFormat(node, "int64")
+      }
 
       new JsonIntegerFormatVisitor with EnumSupport {
         val _node = node
