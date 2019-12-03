@@ -1,0 +1,26 @@
+buildpack:
+  host: git.hubteam.com
+  organization: HubSpotProtected
+  repository: Blazar-Buildpack-Java
+  branch: v2-prebuilt
+
+stepActivation:
+  uploadAndNotify:
+    branches: ['hubspot-release']
+
+steps:
+  - description: "Test across all supported Scala Versions"
+    commands:
+      - echo "SBT_OPTS='-Xms512M -Xmx1024M -Xss2M -XX:MaxMetaspaceSize=1024M' +test"
+      - SBT_OPTS="-Xms512M -Xmx1024M -Xss2M -XX:MaxMetaspaceSize=1024M" +test
+
+  - description: "Package Jar"
+    commands:
+      - echo "sbt package"
+      - sbt package
+
+  - name: uploadAndNotify
+      description: "Notifying deploy service"
+      activeByDefault: false
+      commands:
+        - command: publish-build-success --project
