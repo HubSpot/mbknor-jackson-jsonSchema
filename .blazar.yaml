@@ -4,23 +4,39 @@ buildpack:
   repository: Blazar-Buildpack-Java
   branch: v2-prebuilt
 
+env:
+  SCALA_VERSION: "1.2.3"  # this should match what's in project/build.properties
+  SBT_TAR_FILE_NAME: "sbt-$SCALA_VERSION.tgz"
+  SBT_TAR_LINK: "https://piccolo.link/$SBT_TAR_FILE_NAME"
+  SBT_FILE: "/tmp/sbt-install/$SBT_TAR_FILE_NAME"
+  HOME_BIN: "$HOME/bin"
+  SBT_BIN: "$HOME_BIN/sbt/bin"
+
 stepActivation:
   uploadAndNotify:
     branches: ['hubspot']
 
 steps:
+  - description: "Download and install sbt"
+    commands:
+      - mkdir -p /tmp/sbt-install
+      - mkdir -p $HOME_BIN
+      - wget --quiet $SBT_TAR_LINK -O $SBT_FILE
+      - tar -xvzf $SBT_FILE -C $HOME_BIN
+      - printf '#!/bin/bash \nSBT_OPTS="-Xms512M -Xmx1536M -Xss1M -XX:+CMSClassUnloadingEnabled" \njava $SBT_OPTS -jar `dirname $0`/sbt-launch.jar "$@"' > $SBT_BIN/sbt
+      - chmod u+x $SBT_BIN/sbt
+      - rm -rf /tmp/sbt-install
+
   - description: "Test across all supported Scala Versions"
     commands:
-      - echo "SBT_OPTS='-Xms512M -Xmx1024M -Xss2M -XX:MaxMetaspaceSize=1024M' +test"
-      - SBT_OPTS="-Xms512M -Xmx1024M -Xss2M -XX:MaxMetaspaceSize=1024M" +test
+      - SBT_OPTS="-Xms512M -Xmx1024M -Xss2M -XX:MaxMetaspaceSize=1024M" $SBT_BIN/sbt +test
 
   - description: "Package Jar"
     commands:
-      - echo "sbt package"
-      - sbt package
+      - $SBT_BIN/sbt package
 
   - name: uploadAndNotify
-      description: "Notifying deploy service"
-      activeByDefault: false
-      commands:
-        - command: publish-build-success --project
+    description: "Notifying deploy service"
+    activeByDefault: false
+    commands:
+      - command: publish-build-success --project
