@@ -1,17 +1,18 @@
 lazy val commonSettings = Seq(
-  organization := "com.hubspot",
+  organization := "com.kjetland",
+  organizationName := "mbknor",
   scalaVersion := "2.12.4",
   crossScalaVersions := Seq("2.10.7", "2.11.12", "2.12.8", "2.13.0-M5"),
   publishMavenStyle := true,
   publishArtifact in Test := false,
   pomIncludeRepository := { _ => false },
-  homepage := Some(url("https://github.com/hubspot/mbknor-jackson-jsonSchema")),
-  licenses := Seq("MIT" -> url("https://github.com/hubspot/mbknor-jackson-jsonSchema/blob/master/LICENSE.txt")),
+  homepage := Some(url("https://github.com/mbknor/mbknor-jackson-jsonSchema")),
+  licenses := Seq("MIT" -> url("https://github.com/mbknor/mbknor-jackson-jsonSchema/blob/master/LICENSE.txt")),
   startYear := Some(2016),
   scmInfo := Some(
     ScmInfo(
-      url("https://github.com/hubspot/mbknor-jackson-jsonSchema"),
-      "scm:git@github.com:hubspot/mbknor-jackson-jsonSchema.git"
+      url("https://github.com/mbknor/mbknor-jackson-jsonSchema"),
+      "scm:git@github.com:mbknor/mbknor-jackson-jsonSchema.git"
     )
   ),
   developers := List(

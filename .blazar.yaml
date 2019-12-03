@@ -6,7 +6,7 @@ buildpack:
 
 stepActivation:
   uploadAndNotify:
-    branches: ['hubspot-release']
+    branches: ['hubspot']
 
 steps:
   - description: "Test across all supported Scala Versions"
