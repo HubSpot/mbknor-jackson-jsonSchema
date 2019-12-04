@@ -6,6 +6,7 @@ lazy val commonSettings = Seq(
   publishMavenStyle := true,
   publishArtifact in Test := false,
   pomIncludeRepository := { _ => false },
+  publishTo := Some(Resolver.file("file",  new File("target"))),
   homepage := Some(url("https://github.com/mbknor/mbknor-jackson-jsonSchema")),
   licenses := Seq("MIT" -> url("https://github.com/mbknor/mbknor-jackson-jsonSchema/blob/master/LICENSE.txt")),
   startYear := Some(2016),

@@ -1,4 +1,5 @@
-MAVEN_OPTS: -Xmx1024m -XX:+TieredCompilation -XX:TieredStopAtLevel=1
+buildResources:
+  memoryMb: 4096
 
 buildpack:
   host: git.hubteam.com
@@ -7,6 +8,9 @@ buildpack:
   branch: v2-prebuilt
 
 env:
+  PROJECT_NAME: "mbknor-jackson-jsonschema"
+  PROJECT_VERSION: "1.0-hubspot-SNAPSHOT" # this should match what's in version.sbt
+  PUBLISH_DIR: '"$PROJECT_NAME"_2.12-1.0'
   SCALA_VERSION: "1.2.3"  # this should match what's in project/build.properties
   SBT_TAR_FILE_NAME: "sbt-$SCALA_VERSION.tgz"
   SBT_TAR_LINK: "https://piccolo.link/$SBT_TAR_FILE_NAME"
@@ -18,7 +22,7 @@ stepActivation:
   uploadAndNotify:
     branches: ['hubspot']
 
-steps:
+before:
   - description: "Download and install sbt"
     commands:
       - mkdir -p /tmp/sbt-install
@@ -31,11 +35,26 @@ steps:
 
   - description: "Test across all supported Scala Versions"
     commands:
-      - $SBT_BIN/sbt +test
+      - $SBT_BIN/sbt test #todo: change to +test
 
-  - description: "Package Jar"
+  - description: "Package + Publish Local"
     commands:
-      - $SBT_BIN/sbt package
+      - $SBT_BIN/sbt publish
+
+  - description: "Move artifacts to upload directory"
+    commands:
+      - ls -al target/com/kjetland/mbknor-jackson-jsonschema_2.12/"$PROJECT_VERSION"
+      - ls -al target/scala-2.12
+      - mkdir $PUBLISH_DIR
+      - ls -al
+      - find target/scala-2.12 -maxdepth 1 -type f | xargs -I {} cp {} $PUBLISH_DIR
+      - ls -al
+      - ls -al $PUBLISH_DIR #testing: confirm files copied
+      - mv $PUBLISH_DIR/"$PROJECT_NAME"_2.12-"$PROJECT_VERSION".pom $PUBLISH_DIR/pom.xml #todo: change the branch
+      - mv $PUBLISH_DIR/"$PROJECT_NAME"_2.12-"$PROJECT_VERSION".jar $PUBLISH_DIR/main.jar
+      - mv $PUBLISH_DIR/"$PROJECT_NAME"_2.12-"$PROJECT_VERSION"-sources.jar $PUBLISH_DIR/sources.jar
+      - mv $PUBLISH_DIR/"$PROJECT_NAME"_2.12-"$PROJECT_VERSION"-javadoc.jar $PUBLISH_DIR/javadoc.jar
+      - ls -al $PUBLISH_DIR #testing: confirm success
 
   - name: uploadAndNotify
     description: "Notifying deploy service"
