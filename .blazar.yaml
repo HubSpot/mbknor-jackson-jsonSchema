@@ -1,0 +1,56 @@
+buildResources:
+  memoryMb: 4096
+
+buildpack:
+  host: git.hubteam.com
+  organization: HubSpotProtected
+  repository: Blazar-Buildpack-Java
+  branch: v2-prebuilt
+
+env:
+  PROJECT_NAME: "mbknor-jackson-jsonschema"
+  PUBLISH_DIR: '"$PROJECT_NAME"_2.12-1.0'
+  SBT_TAR_FILE_NAME: "sbt-1.3.8.tgz"
+  SBT_TAR_LINK: "https://piccolo.link/$SBT_TAR_FILE_NAME"
+  SBT_FILE: "/tmp/sbt-install/$SBT_TAR_FILE_NAME"
+  HOME_BIN: "$HOME/bin"
+  SBT_BIN: "$HOME_BIN/sbt/bin"
+
+stepActivation:
+  uploadAndNotify:
+    branches: ['hubspot']
+
+before:
+  - description: "Download and install sbt"
+    commands:
+      - mkdir -p /tmp/sbt-install
+      - mkdir -p $HOME_BIN
+      - wget --quiet $SBT_TAR_LINK -O $SBT_FILE
+      - tar -xvzf $SBT_FILE -C $HOME_BIN
+      - printf '#!/bin/bash \nSBT_OPTS="-Xms512M -Xmx1024M -Xss2M -XX:MaxMetaspaceSize=1024M -XX:+CMSClassUnloadingEnabled" \njava $SBT_OPTS -jar `dirname $0`/sbt-launch.jar "$@"' > $SBT_BIN/sbt
+      - chmod u+x $SBT_BIN/sbt
+      - rm -rf /tmp/sbt-install
+
+  - description: "Test across all supported Scala Versions"
+    commands:
+      - $SBT_BIN/sbt +test
+
+  - description: "Package + Publish Local"
+    commands:
+      - $SBT_BIN/sbt publish
+
+  - description: "Move artifacts to upload directory"
+    commands:
+      - echo export PROJECT_VERSION=$($SBT_BIN/sbt -warn 'print version') >> $BUILD_COMMAND_RC_FILE
+      - mkdir $PUBLISH_DIR
+      - find target/scala-2.12 -maxdepth 1 -type f | xargs -I {} cp {} $PUBLISH_DIR
+      - mv $PUBLISH_DIR/"$PROJECT_NAME"_2.12-"$PROJECT_VERSION".pom $PUBLISH_DIR/pom.xml
+      - mv $PUBLISH_DIR/"$PROJECT_NAME"_2.12-"$PROJECT_VERSION".jar $PUBLISH_DIR/main.jar
+      - mv $PUBLISH_DIR/"$PROJECT_NAME"_2.12-"$PROJECT_VERSION"-sources.jar $PUBLISH_DIR/sources.jar
+      - mv $PUBLISH_DIR/"$PROJECT_NAME"_2.12-"$PROJECT_VERSION"-javadoc.jar $PUBLISH_DIR/javadoc.jar
+
+  - name: uploadAndNotify
+    description: "Notifying deploy service"
+    activeByDefault: false
+    commands:
+      - command: publish-build-success --project
