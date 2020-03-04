@@ -1,9 +1,9 @@
 package com.kjetland.jackson.jsonSchema;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.time.OffsetDateTime;
 import java.util.*;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class UseItFromJavaTest {
 
@@ -40,6 +40,7 @@ public class UseItFromJavaTest {
             new HashSet<>(),
             new HashMap<>(),
             new HashMap<>(),
+            false,
             false);
         JsonSchemaGenerator g2 = new JsonSchemaGenerator(objectMapper, config);
 
