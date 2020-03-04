@@ -10,8 +10,7 @@ buildpack:
 env:
   PROJECT_NAME: "mbknor-jackson-jsonschema"
   PUBLISH_DIR: '"$PROJECT_NAME"_2.12-1.0'
-  SCALA_VERSION: "1.2.3"  # this should match what's in project/build.properties
-  SBT_TAR_FILE_NAME: "sbt-$SCALA_VERSION.tgz"
+  SBT_TAR_FILE_NAME: "sbt-1.3.8.tgz"
   SBT_TAR_LINK: "https://piccolo.link/$SBT_TAR_FILE_NAME"
   SBT_FILE: "/tmp/sbt-install/$SBT_TAR_FILE_NAME"
   HOME_BIN: "$HOME/bin"
@@ -42,7 +41,7 @@ before:
 
   - description: "Move artifacts to upload directory"
     commands:
-      - export PROJECT_VERSION=$($SBT_BIN/sbt -warn 'print version')
+      - echo export PROJECT_VERSION=$($SBT_BIN/sbt -warn 'print version') >> $BUILD_COMMAND_RC_FILE
       - mkdir $PUBLISH_DIR
       - find target/scala-2.12 -maxdepth 1 -type f | xargs -I {} cp {} $PUBLISH_DIR
       - mv $PUBLISH_DIR/"$PROJECT_NAME"_2.12-"$PROJECT_VERSION".pom $PUBLISH_DIR/pom.xml
