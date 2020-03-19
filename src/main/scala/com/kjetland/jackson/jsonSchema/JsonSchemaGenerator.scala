@@ -1098,8 +1098,8 @@ class JsonSchemaGenerator
                   classOf[com.google.common.base.Optional[_]].isAssignableFrom(propertyType.getRawClass)
 
                 // Check if we should set this property as required. Anything with a @JsonProperty that
-                // has "required" set to true, various javax.validation annotations, or any property
-                // that is NOT an Optional type is set as required by default. The @JsonSchemaProperty
+                // has "required" set to true, various javax.validation annotations, has a JsonInclude annotation other than Include.ALWAYS
+                // or any property that is NOT an Optional type is set as required by default. The @JsonSchemaProperty
                 // annotation can be used to override any of these conditions.
                 val requiredProperty:Boolean = jsonSchemaRequired.getOrElse(jsonPropertyRequired || validationAnnotationRequired(prop) || (!optionalType && !jsonIncludeOptional))
 
