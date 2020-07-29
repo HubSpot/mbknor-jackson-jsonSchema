@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.node.{ArrayNode, JsonNodeFactory, ObjectNo
 import com.fasterxml.jackson.databind.util.ClassUtil
 import com.kjetland.jackson.jsonSchema.annotations._
 import io.github.classgraph.{ClassGraph, ScanResult}
+import io.swagger.annotations.ApiModelProperty
 import javax.validation.constraints._
 import org.slf4j.LoggerFactory
 
@@ -1105,7 +1106,14 @@ class JsonSchemaGenerator
 
                 val thisPropertyNode:PropertyNode = {
                   val thisPropertyNode = JsonNodeFactory.instance.objectNode()
-                  propertiesNode.set(propertyName, thisPropertyNode)
+                  val apiModelProperty:Option[ApiModelProperty] = prop.flatMap(p => Option(p.getAnnotation(classOf[ApiModelProperty])))
+
+                  if (apiModelProperty.isDefined && apiModelProperty.exists(!_.name().equals(""))) {
+                    propertiesNode.set(apiModelProperty.get.name(), thisPropertyNode)
+                  } else {
+                    propertiesNode.set(propertyName, thisPropertyNode)
+                  }
+
 
                   if ( config.usePropertyOrdering ) {
                     thisPropertyNode.put("propertyOrder", nextPropertyOrderIndex)
