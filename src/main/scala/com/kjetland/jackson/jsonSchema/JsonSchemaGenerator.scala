@@ -677,6 +677,9 @@ class JsonSchemaGenerator
         log.warn(s"Not able to generate jsonSchema-info for type: ${_type} - probably using custom serializer which does not override acceptJsonFormatVisitor")
       }
 
+      if(_type != null && _type.isTypeOrSubTypeOf(classOf[JsonNode])) {
+        node.put("type", "object")
+      }
 
       new JsonAnyFormatVisitor {
       }
