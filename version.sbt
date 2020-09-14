@@ -1,1 +1,1 @@
-version in ThisBuild := "1.3-hubspot-SNAPSHOT"
+version in ThisBuild := "1.4-hubspot-SNAPSHOT"
