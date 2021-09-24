@@ -1183,9 +1183,7 @@ class JsonSchemaGenerator
                   p =>
                     Option(p.getAnnotation(classOf[JsonSerialize])).map {
                       jsonSerialize =>
-                          if(jsonSerialize.using().equals(classOf[ToStringSerializer])) {
-                            ToStringSerializer.instance.acceptJsonFormatVisitor(childVisitor, propertyType)
-                          }
+                        jsonSerialize.using().newInstance.acceptJsonFormatVisitor(childVisitor, propertyType)
                     }
                 }
 
