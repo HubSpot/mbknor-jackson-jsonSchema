@@ -1,5 +1,13 @@
 package com.kjetland.jackson.jsonSchema.testData;
 
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import com.kjetland.jackson.jsonSchema.testData.utils.LocalDateSerializer;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
@@ -15,6 +23,9 @@ public class PojoWithJsonSerializer {
 
     @JsonSerialize(using = ToStringSerializer.class)
     public double doubleSerializedAsString = 5.5;
+
+    @JsonSerialize(using = LocalDateSerializer.class)
+    public LocalDate localDate = LocalDate.of(2000, 1,1 );
 
     @Override
     public boolean equals(Object o) {

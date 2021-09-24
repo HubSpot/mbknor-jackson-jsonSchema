@@ -1479,6 +1479,11 @@ class JsonSchemaGeneratorTest extends FunSuite with Matchers with BeforeAndAfter
       assert(schema.at("/properties/longSerializedAsString/type").asText() == "string")
 
       assert(schema.at("/properties/doubleSerializedAsString/type").asText() == "string")
+
+      assert(schema.at("/properties/localDate/type").asText() == "string")
+
+      assert(schema.at("/properties/localDate/format").asText() == "date")
+
     }
   }
 }
