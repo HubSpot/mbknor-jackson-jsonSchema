@@ -1,8 +1,8 @@
 package com.kjetland.jackson.jsonSchema.testData;
 
-import java.io.IOException;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.util.Objects;
+
 import com.kjetland.jackson.jsonSchema.testData.utils.LocalDateSerializer;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -35,15 +35,15 @@ public class PojoWithJsonSerializer {
         PojoWithJsonSerializer that = (PojoWithJsonSerializer) o;
 
         if (realLong != that.realLong) return false;
+        if (Double.compare(that.realDouble, realDouble) != 0) return false;
         if (longSerializedAsString != that.longSerializedAsString) return false;
-        return realString != null ? realString.equals(that.realString) : that.realString == null;
+        if (Double.compare(that.doubleSerializedAsString, doubleSerializedAsString) != 0) return false;
+        return Objects.equals(realString, that.realString) && Objects.equals(localDate, that.localDate);
     }
 
     @Override
     public int hashCode() {
-        int result = (int) (realLong ^ (realLong >>> 32));
-        result = 31 * result + (realString != null ? realString.hashCode() : 0);
-        result = 31 * result + (int) (longSerializedAsString ^ (longSerializedAsString >>> 32));
+        int result = Objects.hash(realLong, realDouble, longSerializedAsString, doubleSerializedAsString, realString, localDate);
         return result;
     }
 }
