@@ -1463,6 +1463,29 @@ class JsonSchemaGeneratorTest extends FunSuite with Matchers with BeforeAndAfter
     }
 
   }
+
+  test("pojo with ToStringSerializer") {
+
+    {
+      val jsonNode = assertToFromJson(jsonSchemaGenerator, testData.pojoWithJsonSerializer)
+      val schema = generateAndValidateSchema(jsonSchemaGenerator, testData.pojoWithJsonSerializer.getClass, Some(jsonNode))
+
+      assert(schema.at("/properties/realLong/type").asText() == "integer")
+
+      assert(schema.at("/properties/realDouble/type").asText() == "number")
+
+      assert(schema.at("/properties/realString/type").asText() == "string")
+
+      assert(schema.at("/properties/longSerializedAsString/type").asText() == "string")
+
+      assert(schema.at("/properties/doubleSerializedAsString/type").asText() == "string")
+
+      assert(schema.at("/properties/localDate/type").asText() == "string")
+
+      assert(schema.at("/properties/localDate/format").asText() == "date")
+
+    }
+  }
 }
 
 trait TestData {
@@ -1644,5 +1667,7 @@ trait TestData {
   val genericClassVoid = new GenericClassVoid()
 
   val genericMapLike = new GenericMapLike(Collections.singletonMap("foo", "bar"))
+
+  val pojoWithJsonSerializer = new PojoWithJsonSerializer()
 
 }

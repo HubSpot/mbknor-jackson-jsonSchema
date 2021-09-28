@@ -7,7 +7,7 @@ import java.util.{Optional, List => JList}
 import com.fasterxml.jackson.annotation.{JsonInclude, JsonPropertyDescription, JsonSubTypes, JsonTypeInfo}
 import com.fasterxml.jackson.core.JsonParser.NumberType
 import com.fasterxml.jackson.databind._
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import com.fasterxml.jackson.databind.annotation.{JsonDeserialize, JsonSerialize}
 import com.fasterxml.jackson.databind.introspect.AnnotatedClass
 import com.fasterxml.jackson.databind.jsonFormatVisitors._
 import com.fasterxml.jackson.databind.jsontype.impl.MinimalClassNameIdResolver
@@ -18,6 +18,7 @@ import io.github.classgraph.{ClassGraph, ScanResult}
 import io.swagger.annotations.ApiModelProperty
 import javax.validation.constraints._
 import org.slf4j.LoggerFactory
+
 
 object JsonSchemaGenerator {
   val JSON_SCHEMA_DRAFT_4_URL = "http://json-schema.org/draft-04/schema#"
@@ -1176,6 +1177,14 @@ class JsonSchemaGenerator
 
                 // Pop back the work we were working on..
                 definitionsHandler.popworkInProgress()
+
+                prop.map {
+                  p =>
+                    Option(p.getAnnotation(classOf[JsonSerialize])).map {
+                      jsonSerialize =>
+                        jsonSerialize.using().newInstance.acceptJsonFormatVisitor(childVisitor, propertyType)
+                    }
+                }
 
                 prop.flatMap( resolvePropertyFormat(_) ).foreach {
                   format =>
