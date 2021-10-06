@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.introspect.AnnotatedClass
 import com.fasterxml.jackson.databind.jsonFormatVisitors._
 import com.fasterxml.jackson.databind.jsontype.impl.MinimalClassNameIdResolver
 import com.fasterxml.jackson.databind.node.{ArrayNode, JsonNodeFactory, ObjectNode}
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer
 import com.fasterxml.jackson.databind.util.ClassUtil
 import com.kjetland.jackson.jsonSchema.annotations._
 import io.github.classgraph.{ClassGraph, ScanResult}
@@ -40,7 +41,10 @@ object JsonSchemaConfig {
     useMultipleEditorSelectViaProperty = false,
     uniqueItemClasses = Set(),
     classTypeReMapping = Map(),
-    jsonSuppliers = Map()
+    jsonSuppliers = Map(),
+    supportedJsonSerializer = Set(
+      classOf[ToStringSerializer]
+    )
   )
 
   /**
@@ -75,7 +79,8 @@ object JsonSchemaConfig {
       classOf[java.util.Set[_]]
     ),
     classTypeReMapping = Map(),
-    jsonSuppliers = Map()
+    jsonSuppliers = Map(),
+    supportedJsonSerializer = Set()
   )
 
   /**
@@ -101,7 +106,8 @@ object JsonSchemaConfig {
     useMultipleEditorSelectViaProperty = false,
     uniqueItemClasses = Set(),
     classTypeReMapping = Map(),
-    jsonSuppliers = Map()
+    jsonSuppliers = Map(),
+    supportedJsonSerializer = Set()
   )
 
   // Java-API
@@ -120,6 +126,7 @@ object JsonSchemaConfig {
               uniqueItemClasses:java.util.Set[Class[_]],
               classTypeReMapping:java.util.Map[Class[_], Class[_]],
               jsonSuppliers:java.util.Map[String, Supplier[JsonNode]],
+              supportedJsonSerializer:java.util.Set[Class[_]],
               persistModels:Boolean,
               alwaysReturnDefinitions:Boolean
             ):JsonSchemaConfig = {
@@ -141,6 +148,7 @@ object JsonSchemaConfig {
       uniqueItemClasses.asScala.toSet,
       classTypeReMapping.asScala.toMap,
       jsonSuppliers.asScala.toMap,
+      supportedJsonSerializer.asScala.toSet,
       persistModels,
       alwaysReturnDefinitions
     )
@@ -264,6 +272,7 @@ case class JsonSchemaConfig
   uniqueItemClasses:Set[Class[_]], // If rendering array and type is instanceOf class in this set, then we add 'uniqueItems": true' to schema - See // https://github.com/jdorn/json-editor for more info
   classTypeReMapping:Map[Class[_], Class[_]], // Can be used to prevent rendering using polymorphism for specific classes.
   jsonSuppliers:Map[String, Supplier[JsonNode]], // Suppliers in this map can be accessed using @JsonSchemaInject(jsonSupplierViaLookup = "lookupKey")
+  supportedJsonSerializer:Set[Class[_]], // if using JsonSerialize and serializer type is defined in this set, then we call the inherited acceptJsonFormatVisitor to generate type
   persistModels:Boolean = false, // Whether or not to persist seen models between calls to `generateJsonSchema`
   alwaysReturnDefinitions:Boolean = false, // If true, will always return corresponding "definitions" if any model properties are ref properties
   subclassesResolver:SubclassesResolver = new SubclassesResolverImpl(), // Using default impl that scans entire classpath
@@ -1181,8 +1190,12 @@ class JsonSchemaGenerator
                 prop.map {
                   p =>
                     Option(p.getAnnotation(classOf[JsonSerialize])).map {
-                      jsonSerialize =>
-                        jsonSerialize.using().newInstance.acceptJsonFormatVisitor(childVisitor, propertyType)
+                      jsonSerialize => {
+                        val serializer = jsonSerialize.using()
+                        if (config.supportedJsonSerializer.contains(serializer)) {
+                          serializer.newInstance.acceptJsonFormatVisitor(childVisitor, propertyType)
+                        }
+                      }
                     }
                 }
 
