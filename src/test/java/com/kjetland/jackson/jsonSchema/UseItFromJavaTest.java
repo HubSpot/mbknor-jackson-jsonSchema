@@ -40,6 +40,7 @@ public class UseItFromJavaTest {
             new HashSet<>(),
             new HashMap<>(),
             new HashMap<>(),
+            new HashSet<>(),
             false,
             false);
         JsonSchemaGenerator g2 = new JsonSchemaGenerator(objectMapper, config);
