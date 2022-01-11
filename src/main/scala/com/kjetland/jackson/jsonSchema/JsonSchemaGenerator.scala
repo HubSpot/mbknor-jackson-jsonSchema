@@ -1068,7 +1068,7 @@ class JsonSchemaGenerator
 
                   val objectOptionsNode = JsonNodeFactory.instance.objectNode()
                   objectOptionsNode.set("multiple_editor_select_via_property", multipleEditorSelectViaPropertyNode)
-                  thisObjectNode.set("options", objectOptionsNode)
+                  thisObjectNode.set("options", objectOptionsNode).asInstanceOf[ObjectNode]
                 }
 
             }
@@ -1347,7 +1347,7 @@ class JsonSchemaGenerator
           case node: ObjectNode =>
             // Overwrite field
             val value = updateNode.get(fieldName)
-            node.set(fieldName, value)
+            node.set(fieldName, value).asInstanceOf[ObjectNode]
           case _ =>
         }
       }
@@ -1480,7 +1480,7 @@ class JsonSchemaGenerator
     rootObjectMapper.acceptJsonFormatVisitor(javaType, rootVisitor)
 
     handlerToUse.getFinalDefinitionsNode().foreach {
-      definitionsNode => rootNode.set("definitions", definitionsNode)
+      definitionsNode => rootNode.set("definitions", definitionsNode).asInstanceOf[ObjectNode]
     }
 
     if (javaType != null) {

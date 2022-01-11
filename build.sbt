@@ -36,8 +36,8 @@ lazy val commonSettings = Seq(
 )
 
 
-val jacksonVersion = "2.9.8"
-val jacksonModuleScalaVersion = "2.9.8"
+val jacksonVersion = "2.12.5"
+val jacksonModuleScalaVersion = "2.12.5"
 val slf4jVersion = "1.7.26"
 val swaggerApiVersion = "1.5.13"
 
@@ -47,7 +47,7 @@ lazy val deps  = Seq(
   "javax.validation" % "validation-api" % "2.0.1.Final",
   "org.slf4j" % "slf4j-api" % slf4jVersion,
   "io.swagger" % "swagger-annotations" % swaggerApiVersion,
-  "io.github.classgraph" % "classgraph" % "4.8.22",
+  "io.github.classgraph" % "classgraph" % "4.8.52",
   "com.google.guava" % "guava" % "25.0-jre", 
   "org.scalatest" %% "scalatest" % "3.0.7" % "test",
   "ch.qos.logback" % "logback-classic" % "1.2.3" % "test",
