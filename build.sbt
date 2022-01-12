@@ -47,7 +47,7 @@ lazy val deps  = Seq(
   "javax.validation" % "validation-api" % "2.0.1.Final",
   "org.slf4j" % "slf4j-api" % slf4jVersion,
   "io.swagger" % "swagger-annotations" % swaggerApiVersion,
-  "io.github.classgraph" % "classgraph" % "4.8.52",
+  "io.github.classgraph" % "classgraph" % "4.8.22",
   "com.google.guava" % "guava" % "25.0-jre", 
   "org.scalatest" %% "scalatest" % "3.0.7" % "test",
   "ch.qos.logback" % "logback-classic" % "1.2.3" % "test",
