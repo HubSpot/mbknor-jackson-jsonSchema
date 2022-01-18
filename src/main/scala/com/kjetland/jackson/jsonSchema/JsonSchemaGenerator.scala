@@ -1347,7 +1347,7 @@ class JsonSchemaGenerator
           case node: ObjectNode =>
             // Overwrite field
             val value = updateNode.get(fieldName)
-            node.set(fieldName, value).asInstanceOf[ObjectNode]
+            node.set(fieldName, value).asInstanceOf[JsonNode]
           case _ =>
         }
       }
