@@ -1,11 +1,9 @@
+buildpack:
+  name: Blazar-Buildpack-Java-prebuilt
+
 buildResources:
   memoryMb: 4096
 
-buildpack:
-  host: git.hubteam.com
-  organization: HubSpotProtected
-  repository: Blazar-Buildpack-Java
-  branch: v2-prebuilt
 
 env:
   PROJECT_NAME: "mbknor-jackson-jsonschema"
