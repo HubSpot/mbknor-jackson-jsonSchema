@@ -40,14 +40,15 @@ before:
 
   - description: "Move artifacts to upload directory"
     commands:
-      - echo export PROJECT_VERSION=$($SBT_BIN/sbt -warn 'print version') >> $BUILD_COMMAND_RC_FILE
-      - echo export PUBLISH_DIR=$PUBLISH_DIR_WITHOUT_VERSION-$(echo $PROJECT_VERSION | sed -n 's/^\([[:digit:]]*\.[[:digit:]]*\)-.*$/\1/p') >> $BUILD_COMMAND_RC_FILE
-      - mkdir $PUBLISH_DIR
-      - find target/scala-2.12 -maxdepth 1 -type f | xargs -I {} cp {} $PUBLISH_DIR
-      - mv $PUBLISH_DIR/"$PROJECT_NAME"_2.12-"$PROJECT_VERSION".pom $PUBLISH_DIR/pom.xml
-      - mv $PUBLISH_DIR/"$PROJECT_NAME"_2.12-"$PROJECT_VERSION".jar $PUBLISH_DIR/main.jar
-      - mv $PUBLISH_DIR/"$PROJECT_NAME"_2.12-"$PROJECT_VERSION"-sources.jar $PUBLISH_DIR/sources.jar
-      - mv $PUBLISH_DIR/"$PROJECT_NAME"_2.12-"$PROJECT_VERSION"-javadoc.jar $PUBLISH_DIR/javadoc.jar
+      - |
+        echo export PROJECT_VERSION=$($SBT_BIN/sbt -warn 'print version') >> $BUILD_COMMAND_RC_FILE
+        echo export PUBLISH_DIR=$PUBLISH_DIR_WITHOUT_VERSION-$(echo $PROJECT_VERSION | sed -n 's/^\([[:digit:]]*\.[[:digit:]]*\)-.*$/\1/p') >> $BUILD_COMMAND_RC_FILE
+        mkdir $PUBLISH_DIR
+        find target/scala-2.12 -maxdepth 1 -type f | xargs -I {} cp {} $PUBLISH_DIR
+        mv $PUBLISH_DIR/"$PROJECT_NAME"_2.12-"$PROJECT_VERSION".pom $PUBLISH_DIR/pom.xml
+        mv $PUBLISH_DIR/"$PROJECT_NAME"_2.12-"$PROJECT_VERSION".jar $PUBLISH_DIR/main.jar
+        mv $PUBLISH_DIR/"$PROJECT_NAME"_2.12-"$PROJECT_VERSION"-sources.jar $PUBLISH_DIR/sources.jar
+        mv $PUBLISH_DIR/"$PROJECT_NAME"_2.12-"$PROJECT_VERSION"-javadoc.jar $PUBLISH_DIR/javadoc.jar
 
   - name: uploadAndNotify
     description: "Notifying deploy service"
