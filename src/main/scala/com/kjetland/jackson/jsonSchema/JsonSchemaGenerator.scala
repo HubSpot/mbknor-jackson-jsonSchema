@@ -1121,6 +1121,10 @@ class JsonSchemaGenerator
                   val thisPropertyNode = JsonNodeFactory.instance.objectNode()
                   val apiModelProperty:Option[ApiModelProperty] = prop.flatMap(p => Option(p.getAnnotation(classOf[ApiModelProperty])))
 
+                  if (apiModelProperty.isDefined && apiModelProperty.exists(!_.dataType().equals(""))) {
+                    propertyType = apiModelProperty.get.dataType();
+                  }
+
                   if (apiModelProperty.isDefined && apiModelProperty.exists(!_.name().equals(""))) {
                     propertiesNode.set(apiModelProperty.get.name(), thisPropertyNode)
                   } else {
