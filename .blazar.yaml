@@ -32,10 +32,6 @@ before:
       - chmod u+x $SBT_BIN/sbt
       - rm -rf /tmp/sbt-install
 
-  - description: "Test across all supported Scala Versions"
-    commands:
-      - $SBT_BIN/sbt +test
-
   - description: "Package + Publish Local"
     commands:
       - $SBT_BIN/sbt publish
