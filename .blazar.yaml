@@ -34,6 +34,8 @@ before:
 
   - description: "Package + Publish Local"
     commands:
+      - curl https://repo.typesafe.com || true
+      - curl https://repo.scala-sbt.org || true
       - $SBT_BIN/sbt publish
 
   - description: "Move artifacts to upload directory"
