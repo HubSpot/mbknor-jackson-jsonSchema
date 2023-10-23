@@ -7,6 +7,7 @@ import java.util.{Optional, List => JList}
 import com.fasterxml.jackson.annotation.{JsonInclude, JsonPropertyDescription, JsonSubTypes, JsonTypeInfo}
 import com.fasterxml.jackson.core.JsonParser.NumberType
 import com.fasterxml.jackson.databind._
+
 import com.fasterxml.jackson.databind.annotation.{JsonDeserialize, JsonSerialize}
 import com.fasterxml.jackson.databind.introspect.AnnotatedClass
 import com.fasterxml.jackson.databind.jsonFormatVisitors._
@@ -1068,7 +1069,7 @@ class JsonSchemaGenerator
 
                   val objectOptionsNode = JsonNodeFactory.instance.objectNode()
                   objectOptionsNode.set("multiple_editor_select_via_property", multipleEditorSelectViaPropertyNode)
-                  thisObjectNode.set("options", objectOptionsNode)
+                  thisObjectNode.set("options", objectOptionsNode).asInstanceOf[ObjectNode]
                 }
 
             }
@@ -1117,9 +1118,15 @@ class JsonSchemaGenerator
                 // annotation can be used to override any of these conditions.
                 val requiredProperty:Boolean = jsonSchemaRequired.getOrElse(jsonPropertyRequired || validationAnnotationRequired(prop) || (!optionalType && !jsonIncludeOptional))
 
+                var sanitizedPropertyType:JavaType = propertyType;
+
                 val thisPropertyNode:PropertyNode = {
                   val thisPropertyNode = JsonNodeFactory.instance.objectNode()
                   val apiModelProperty:Option[ApiModelProperty] = prop.flatMap(p => Option(p.getAnnotation(classOf[ApiModelProperty])))
+
+                  if (apiModelProperty.isDefined && apiModelProperty.exists(_.dataType().equals("java.lang.String"))) {
+                    sanitizedPropertyType = objectMapper.getTypeFactory.constructFromCanonical("java.lang.String")
+                  }
 
                   if (apiModelProperty.isDefined && apiModelProperty.exists(!_.name().equals(""))) {
                     propertiesNode.set(apiModelProperty.get.name(), thisPropertyNode)
@@ -1165,10 +1172,10 @@ class JsonSchemaGenerator
                 // Push current work in progress since we're about to start working on a new class
                 definitionsHandler.pushWorkInProgress()
 
-                if((classOf[Option[_]].isAssignableFrom(propertyType.getRawClass) ||
-                  classOf[Optional[_]].isAssignableFrom(propertyType.getRawClass) ||
-                  classOf[com.google.common.base.Optional[_]].isAssignableFrom(propertyType.getRawClass))
-                  && propertyType.containedTypeCount() >= 1) {
+                if((classOf[Option[_]].isAssignableFrom(sanitizedPropertyType.getRawClass) ||
+                  classOf[Optional[_]].isAssignableFrom(sanitizedPropertyType.getRawClass) ||
+                  classOf[com.google.common.base.Optional[_]].isAssignableFrom(sanitizedPropertyType.getRawClass))
+                  && sanitizedPropertyType.containedTypeCount() >= 1) {
 
                   // Property is scala Option or Java/Guava Optional.
                   //
@@ -1176,12 +1183,12 @@ class JsonSchemaGenerator
                   // To workaround this, we use the same workaround as jackson-scala-module described here:
                   // https://github.com/FasterXML/jackson-module-scala/wiki/FAQ#deserializing-optionint-and-other-primitive-challenges
 
-                  val optionType:JavaType = resolveType(propertyType, prop, objectMapper)
+                  val optionType:JavaType = resolveType(sanitizedPropertyType, prop, objectMapper)
 
                   objectMapper.acceptJsonFormatVisitor( tryToReMapType(optionType), childVisitor)
 
                 } else {
-                  objectMapper.acceptJsonFormatVisitor( tryToReMapType(propertyType), childVisitor)
+                  objectMapper.acceptJsonFormatVisitor( tryToReMapType(sanitizedPropertyType), childVisitor)
                 }
 
                 // Pop back the work we were working on..
@@ -1193,7 +1200,7 @@ class JsonSchemaGenerator
                       jsonSerialize => {
                         val serializer = jsonSerialize.using()
                         if (config.supportedJsonSerializer.contains(serializer)) {
-                          serializer.newInstance.acceptJsonFormatVisitor(childVisitor, propertyType)
+                          serializer.newInstance.acceptJsonFormatVisitor(childVisitor, sanitizedPropertyType)
                         }
                       }
                     }
@@ -1347,7 +1354,7 @@ class JsonSchemaGenerator
           case node: ObjectNode =>
             // Overwrite field
             val value = updateNode.get(fieldName)
-            node.set(fieldName, value)
+            node.set(fieldName, value).asInstanceOf[JsonNode]
           case _ =>
         }
       }
@@ -1480,7 +1487,7 @@ class JsonSchemaGenerator
     rootObjectMapper.acceptJsonFormatVisitor(javaType, rootVisitor)
 
     handlerToUse.getFinalDefinitionsNode().foreach {
-      definitionsNode => rootNode.set("definitions", definitionsNode)
+      definitionsNode => rootNode.set("definitions", definitionsNode).asInstanceOf[ObjectNode]
     }
 
     if (javaType != null) {

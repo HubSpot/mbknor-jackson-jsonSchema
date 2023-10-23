@@ -13,7 +13,7 @@ env:
   SBT_TAR_LINK: "https://github.com/sbt/sbt/releases/download/v$SBT_TAR_VERSION/$SBT_TAR_FILE_NAME"
   SBT_FILE: "/tmp/sbt-install/$SBT_TAR_FILE_NAME"
   HOME_BIN: "$HOME/bin"
-  SBT_BIN: "$HOME_BIN/sbt/bin"
+  SBT_BIN: "${HOME_BIN}/sbt/bin"
 
 stepActivation:
   uploadAndNotify:
@@ -26,7 +26,7 @@ before:
       - mkdir -p $HOME_BIN
       - wget --quiet $SBT_TAR_LINK -O $SBT_FILE
       - tar -xvzf $SBT_FILE -C $HOME_BIN
-      - printf '#!/bin/bash \nSBT_OPTS="-Xms512M -Xmx1024M -Xss2M -XX:MaxMetaspaceSize=1024M -XX:+CMSClassUnloadingEnabled" \njava $SBT_OPTS -jar `dirname $0`/sbt-launch.jar "$@"' > $SBT_BIN/sbt
+      - printf '#!/bin/bash \nSBT_OPTS="-Xms512M -Xmx1024M -Xss2M -XX:MaxMetaspaceSize=1024M" \njava $SBT_OPTS -jar `dirname $0`/sbt-launch.jar "$@"' > $SBT_BIN/sbt
       - chmod u+x $SBT_BIN/sbt
       - rm -rf /tmp/sbt-install
 
