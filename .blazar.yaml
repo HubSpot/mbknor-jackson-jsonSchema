@@ -13,7 +13,7 @@ env:
   SBT_TAR_LINK: "https://github.com/sbt/sbt/releases/download/v$SBT_TAR_VERSION/$SBT_TAR_FILE_NAME"
   SBT_FILE: "/tmp/sbt-install/$SBT_TAR_FILE_NAME"
   HOME_BIN: "$HOME/bin"
-  SBT_BIN: "$HOME_BIN/sbt/bin"
+  SBT_BIN: "${HOME_BIN}/sbt/bin"
 
 stepActivation:
   uploadAndNotify:

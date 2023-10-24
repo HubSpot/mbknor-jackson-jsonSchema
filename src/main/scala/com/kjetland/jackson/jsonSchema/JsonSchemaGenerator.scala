@@ -1117,14 +1117,16 @@ class JsonSchemaGenerator
                 // annotation can be used to override any of these conditions.
                 val requiredProperty:Boolean = jsonSchemaRequired.getOrElse(jsonPropertyRequired || validationAnnotationRequired(prop) || (!optionalType && !jsonIncludeOptional))
 
+                var sanitizedPropertyType:JavaType = propertyType;
+
                 val thisPropertyNode:PropertyNode = {
                   val thisPropertyNode = JsonNodeFactory.instance.objectNode()
                   val apiModelProperty:Option[ApiModelProperty] = prop.flatMap(p => Option(p.getAnnotation(classOf[ApiModelProperty])))
 
-                  if (apiModelProperty.isDefined && apiModelProperty.exists(!_.dataType().equals(""))) {
-                    propertyType = apiModelProperty.get.dataType();
+                  if (apiModelProperty.isDefined && apiModelProperty.exists(_.dataType().equals("java.lang.String"))) {
+                    sanitizedPropertyType = objectMapper.getTypeFactory.constructFromCanonical("java.lang.String")
                   }
-
+                  
                   if (apiModelProperty.isDefined && apiModelProperty.exists(!_.name().equals(""))) {
                     propertiesNode.set(apiModelProperty.get.name(), thisPropertyNode)
                   } else {
@@ -1169,9 +1171,9 @@ class JsonSchemaGenerator
                 // Push current work in progress since we're about to start working on a new class
                 definitionsHandler.pushWorkInProgress()
 
-                if((classOf[Option[_]].isAssignableFrom(propertyType.getRawClass) ||
-                  classOf[Optional[_]].isAssignableFrom(propertyType.getRawClass) ||
-                  classOf[com.google.common.base.Optional[_]].isAssignableFrom(propertyType.getRawClass))
+                if((classOf[Option[_]].isAssignableFrom(sanitizedPropertyType.getRawClass) ||
+                  classOf[Optional[_]].isAssignableFrom(sanitizedPropertyType.getRawClass) ||
+                  classOf[com.google.common.base.Optional[_]].isAssignableFrom(sanitizedPropertyType.getRawClass))
                   && propertyType.containedTypeCount() >= 1) {
 
                   // Property is scala Option or Java/Guava Optional.
@@ -1180,12 +1182,12 @@ class JsonSchemaGenerator
                   // To workaround this, we use the same workaround as jackson-scala-module described here:
                   // https://github.com/FasterXML/jackson-module-scala/wiki/FAQ#deserializing-optionint-and-other-primitive-challenges
 
-                  val optionType:JavaType = resolveType(propertyType, prop, objectMapper)
+                  val optionType:JavaType = resolveType(sanitizedPropertyType, prop, objectMapper)
 
                   objectMapper.acceptJsonFormatVisitor( tryToReMapType(optionType), childVisitor)
 
                 } else {
-                  objectMapper.acceptJsonFormatVisitor( tryToReMapType(propertyType), childVisitor)
+                  objectMapper.acceptJsonFormatVisitor( tryToReMapType(sanitizedPropertyType), childVisitor)
                 }
 
                 // Pop back the work we were working on..
