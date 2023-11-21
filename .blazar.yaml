@@ -47,6 +47,7 @@ before:
       - find target/scala-2.12 -maxdepth 1 -type f | xargs -I {} cp {} $PUBLISH_DIR
       - echo $PROJECT_NAME
       - mv $PUBLISH_DIR/"$PROJECT_NAME"_2.12-"$PROJECT_VERSION".pom $PUBLISH_DIR/pom.xml
+      - cat $PUBLISH_DIR/pom.xml
       - mv $PUBLISH_DIR/"$PROJECT_NAME"_2.12-"$PROJECT_VERSION".jar $PUBLISH_DIR/main.jar
       - mv $PUBLISH_DIR/"$PROJECT_NAME"_2.12-"$PROJECT_VERSION"-sources.jar $PUBLISH_DIR/sources.jar
       - mv $PUBLISH_DIR/"$PROJECT_NAME"_2.12-"$PROJECT_VERSION"-javadoc.jar $PUBLISH_DIR/javadoc.jar
