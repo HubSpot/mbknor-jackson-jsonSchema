@@ -42,6 +42,9 @@ before:
     commands:
       - echo export PROJECT_VERSION=$($SBT_BIN/sbt -warn 'print version') >> $BUILD_COMMAND_RC_FILE
       - echo export PUBLISH_DIR=$PUBLISH_DIR_WITHOUT_VERSION-$(echo $PROJECT_VERSION | sed -n 's/^\([[:digit:]]*\.[[:digit:]]*\)-.*$/\1/p') >> $BUILD_COMMAND_RC_FILE
+      - echo $PROJECT_VERSION
+      - echo $PUBLISH_DIR_WITHOUT_VERSION
+      - echo $PUBLISH_DIR
       - mkdir $PUBLISH_DIR
       - find target/scala-2.12 -maxdepth 1 -type f | xargs -I {} cp {} $PUBLISH_DIR
       - mv $PUBLISH_DIR/"$PROJECT_NAME"_2.12-"$PROJECT_VERSION".pom $PUBLISH_DIR/pom.xml
