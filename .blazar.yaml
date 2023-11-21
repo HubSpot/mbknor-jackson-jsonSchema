@@ -46,6 +46,7 @@ before:
       - mkdir $PUBLISH_DIR
       - find target/scala-2.12 -maxdepth 1 -type f | xargs -I {} cp {} $PUBLISH_DIR
       - echo $PROJECT_NAME
+      - echo $PROJECT_VERSION
       - echo $PUBLISH_DIR
       - mv $PUBLISH_DIR/"$PROJECT_NAME"_2.12-"$PROJECT_VERSION".pom $PUBLISH_DIR/pom.xml
       - mv $PUBLISH_DIR/"$PROJECT_NAME"_2.12-"$PROJECT_VERSION".jar $PUBLISH_DIR/main.jar
