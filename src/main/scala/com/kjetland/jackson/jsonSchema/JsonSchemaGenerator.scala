@@ -2,7 +2,7 @@ package com.kjetland.jackson.jsonSchema
 
 import java.util
 import java.util.function.Supplier
-import java.util.{Optional, List => JList}
+import java.util.{Optional, OptionalDouble, OptionalInt, OptionalLong, List => JList}
 
 import com.fasterxml.jackson.annotation.{JsonInclude, JsonPropertyDescription, JsonSubTypes, JsonTypeInfo}
 import com.fasterxml.jackson.core.JsonParser.NumberType
@@ -1109,7 +1109,10 @@ class JsonSchemaGenerator
                 // Figure out if the type is considered optional by either Java or Scala.
                 val optionalType:Boolean = classOf[Option[_]].isAssignableFrom(propertyType.getRawClass) ||
                   classOf[Optional[_]].isAssignableFrom(propertyType.getRawClass) ||
-                  classOf[com.google.common.base.Optional[_]].isAssignableFrom(propertyType.getRawClass)
+                  classOf[com.google.common.base.Optional[_]].isAssignableFrom(propertyType.getRawClass) ||
+                  classOf[OptionalDouble.isAssignableFrom(propertyType.getRawClass) ||
+                  classOf[OptionalInt.isAssignableFrom(propertyType.getRawClass) ||
+                  classOf[OptionalLong.isAssignableFrom(propertyType.getRawClass)
 
                 // Check if we should set this property as required. Anything with a @JsonProperty that
                 // has "required" set to true, various javax.validation annotations, has a JsonInclude annotation other than Include.ALWAYS
