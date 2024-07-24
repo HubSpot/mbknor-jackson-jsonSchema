@@ -1110,9 +1110,9 @@ class JsonSchemaGenerator
                 val optionalType:Boolean = classOf[Option[_]].isAssignableFrom(propertyType.getRawClass) ||
                   classOf[Optional[_]].isAssignableFrom(propertyType.getRawClass) ||
                   classOf[com.google.common.base.Optional[_]].isAssignableFrom(propertyType.getRawClass) ||
-                  classOf[OptionalDouble.isAssignableFrom(propertyType.getRawClass) ||
-                  classOf[OptionalInt.isAssignableFrom(propertyType.getRawClass) ||
-                  classOf[OptionalLong.isAssignableFrom(propertyType.getRawClass)
+                  classOf[OptionalDouble].isAssignableFrom(propertyType.getRawClass) ||
+                  classOf[OptionalInt].isAssignableFrom(propertyType.getRawClass) ||
+                  classOf[OptionalLong].isAssignableFrom(propertyType.getRawClass)
 
                 // Check if we should set this property as required. Anything with a @JsonProperty that
                 // has "required" set to true, various javax.validation annotations, has a JsonInclude annotation other than Include.ALWAYS
