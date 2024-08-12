@@ -25,7 +25,7 @@ import com.kjetland.jackson.jsonSchema.testDataScala._
 import com.kjetland.jackson.jsonSchema.testData_issue_24.EntityWrapper
 import org.scalatest.{BeforeAndAfter, FunSuite, Ignore, Matchers}
 import scala.compat.java8.OptionConverters._
-import scala.collection.JavaConverters._
+import java.util.{Optional, OptionalDouble, OptionalInt, OptionalLong}
 
 class JsonSchemaGeneratorTest extends FunSuite with Matchers with BeforeAndAfter {
 
@@ -1582,7 +1582,7 @@ trait TestData {
 
   val manyPrimitivesScala = ManyPrimitivesScala("s1", 1, _boolean = true, 0.1)
 
-  val pojoUsingOptionScala = PojoUsingOptionScala(Some("s1"), Some(1), Some(1).asPrimitive, Some(true), Some(0.1), Some(0.1).asPrimitive, Some(1L).asPrimitive, Some(child1Scala), Some(List(classNotExtendingAnythingScala)))
+  val pojoUsingOptionScala = PojoUsingOptionScala(Some("s1"), Some(1), Some(true), Some(0.1), Some(child1Scala), Some(List(classNotExtendingAnythingScala)))
 
   val pojoUsingOptionalJava = new PojoUsingOptionalJava(Optional.of("s"), Optional.of(1), Optional.of(5), Optional.of(child1), Optional.of(util.Arrays.asList(classNotExtendingAnything)))
 
