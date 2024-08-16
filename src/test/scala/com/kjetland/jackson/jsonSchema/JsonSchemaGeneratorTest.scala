@@ -24,8 +24,7 @@ import com.kjetland.jackson.jsonSchema.testData.polymorphism5.{Child51, Child52,
 import com.kjetland.jackson.jsonSchema.testDataScala._
 import com.kjetland.jackson.jsonSchema.testData_issue_24.EntityWrapper
 import org.scalatest.{BeforeAndAfter, FunSuite, Ignore, Matchers}
-import scala.compat.java8.OptionConverters._
-import java.util.{Optional, OptionalDouble, OptionalInt, OptionalLong}
+import scala.collection.JavaConverters._
 
 class JsonSchemaGeneratorTest extends FunSuite with Matchers with BeforeAndAfter {
 
