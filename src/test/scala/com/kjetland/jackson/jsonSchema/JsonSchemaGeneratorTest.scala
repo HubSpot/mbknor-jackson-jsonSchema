@@ -2,8 +2,7 @@ package com.kjetland.jackson.jsonSchema
 
 import java.time.{LocalDate, LocalDateTime, OffsetDateTime}
 import java.util
-import java.util.{Collections, Optional, TimeZone}
-
+import java.util.{Collections, Optional, OptionalDouble, OptionalInt, OptionalLong, TimeZone}
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.databind.node.{ArrayNode, MissingNode, ObjectNode}
 import com.fasterxml.jackson.databind.{JavaType, JsonNode, ObjectMapper, SerializationFeature}
@@ -26,6 +25,7 @@ import com.kjetland.jackson.jsonSchema.testData_issue_24.EntityWrapper
 import org.scalatest.{BeforeAndAfter, FunSuite, Ignore, Matchers}
 
 import scala.collection.JavaConverters._
+
 
 class JsonSchemaGeneratorTest extends FunSuite with Matchers with BeforeAndAfter {
 
@@ -1582,7 +1582,7 @@ trait TestData {
 
   val manyPrimitivesScala = ManyPrimitivesScala("s1", 1, _boolean = true, 0.1)
 
-  val pojoUsingOptionScala = PojoUsingOptionScala(Some("s1"), Some(1), Some(true), Some(0.1), Some(child1Scala), Some(List(classNotExtendingAnythingScala)))
+  val pojoUsingOptionScala = PojoUsingOptionScala(Some("s1"), Some(1), OptionalInt.of(1), Some(true), Some(0.1), OptionalDouble.of(0.1), OptionalLong.of(1L), Some(child1Scala), Some(List(classNotExtendingAnythingScala)))
 
   val pojoUsingOptionalJava = new PojoUsingOptionalJava(Optional.of("s"), Optional.of(1), Optional.of(5), Optional.of(child1), Optional.of(util.Arrays.asList(classNotExtendingAnything)))
 

@@ -42,6 +42,7 @@ val slf4jVersion = "1.7.26"
 val swaggerApiVersion = "1.5.13"
 
 
+
 lazy val deps  = Seq(
   "com.fasterxml.jackson.core" % "jackson-databind" % jacksonVersion,
   "javax.validation" % "validation-api" % "2.0.1.Final",
