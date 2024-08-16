@@ -40,7 +40,6 @@ val jacksonVersion = "2.9.8"
 val jacksonModuleScalaVersion = "2.9.8"
 val slf4jVersion = "1.7.26"
 val swaggerApiVersion = "1.5.13"
-val scalaJava8CompatVersion = "1.0.2"
 
 
 
@@ -58,8 +57,7 @@ lazy val deps  = Seq(
   "com.fasterxml.jackson.datatype" % "jackson-datatype-jdk8" % jacksonVersion % "test",
   "com.fasterxml.jackson.datatype" % "jackson-datatype-jsr310" % jacksonVersion % "test",
   "joda-time" % "joda-time" % "2.10.1" % "test",
-  "com.fasterxml.jackson.datatype" % "jackson-datatype-joda" % jacksonVersion % "test",
-  "org.scala-lang.modules" %% "scala-java8-compat" % "0.9.0"
+  "com.fasterxml.jackson.datatype" % "jackson-datatype-joda" % jacksonVersion % "test"
 )
 
 lazy val root = (project in file("."))
