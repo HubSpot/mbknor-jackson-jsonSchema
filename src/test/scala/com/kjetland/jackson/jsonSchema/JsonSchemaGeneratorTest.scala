@@ -3,7 +3,6 @@ package com.kjetland.jackson.jsonSchema
 import java.time.{LocalDate, LocalDateTime, OffsetDateTime}
 import java.util
 import java.util.{Collections, Optional, TimeZone}
-
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.databind.node.{ArrayNode, MissingNode, ObjectNode}
 import com.fasterxml.jackson.databind.{JavaType, JsonNode, ObjectMapper, SerializationFeature}
@@ -24,9 +23,9 @@ import com.kjetland.jackson.jsonSchema.testData.polymorphism5.{Child51, Child52,
 import com.kjetland.jackson.jsonSchema.testDataScala._
 import com.kjetland.jackson.jsonSchema.testData_issue_24.EntityWrapper
 import org.scalatest.{BeforeAndAfter, FunSuite, Ignore, Matchers}
-import scala.compat.java8.OptionConverters._
 
 import scala.collection.JavaConverters._
+import scala.compat.java8.OptionConverters.RichOptionForJava8
 
 class JsonSchemaGeneratorTest extends FunSuite with Matchers with BeforeAndAfter {
 
