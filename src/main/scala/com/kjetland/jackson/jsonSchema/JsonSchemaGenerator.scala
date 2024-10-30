@@ -943,7 +943,8 @@ class JsonSchemaGenerator
     override def expectObjectFormat(_type: JavaType) = {
       // Fix for jackson 2.13+ https://github.com/FasterXML/jackson-databind/blob/2.17/src/main/java/com/fasterxml/jackson/databind/ser/std/ToEmptyObjectSerializer.java#L75
       if (_type.hasRawClass(classOf[java.lang.Object])) {
-        return expectAnyFormat(_type)
+        expectAnyFormat(_type)
+        return null
       }
       val subTypes: List[Class[_]] = extractSubTypes(_type)
 
