@@ -1582,7 +1582,7 @@ trait TestData {
 
   val manyPrimitivesScala = ManyPrimitivesScala("s1", 1, _boolean = true, 0.1)
 
-  val pojoUsingOptionScala = PojoUsingOptionScala(Some("s1"), Some(1), Some(true), Some(0.1), Some(child1Scala), Some(List(classNotExtendingAnythingScala)))
+  val pojoUsingOptionScala = PojoUsingOptionScala(Some("s1"), Some(1), OptionalInt.of(2), Some(true), Some(0.1), OptionalDouble.of(2.0), OptionalLong.of(2), Some(child1Scala), Some(List(classNotExtendingAnythingScala)))
 
   val pojoUsingOptionalJava = new PojoUsingOptionalJava(Optional.of("s"), Optional.of(1), Optional.of(5), Optional.of(child1), Optional.of(util.Arrays.asList(classNotExtendingAnything)))
 
