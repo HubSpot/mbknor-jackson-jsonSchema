@@ -2,7 +2,7 @@ package com.kjetland.jackson.jsonSchema
 
 import java.time.{LocalDate, LocalDateTime, OffsetDateTime}
 import java.util
-import java.util.{Collections, Optional, TimeZone}
+import java.util.{Collections, Optional, TimeZone, OptionalDouble, OptionalInt, OptionalLong}
 
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.databind.node.{ArrayNode, MissingNode, ObjectNode}
