@@ -940,7 +940,7 @@ class JsonSchemaGenerator
       merge(thisObjectNode, injectJsonNode)
     }
 
-    override def expectObjectFormat(_type: JavaType) = {
+    override def expectObjectFormat(_type: JavaType): JsonObjectFormatVisitor = {
       // Fix for jackson 2.13+ https://github.com/FasterXML/jackson-databind/blob/2.17/src/main/java/com/fasterxml/jackson/databind/ser/std/ToEmptyObjectSerializer.java#L75
       if (_type.hasRawClass(classOf[java.lang.Object])) {
         expectAnyFormat(_type)
