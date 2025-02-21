@@ -63,6 +63,9 @@ class JsonSchemaGeneratorTest extends FunSuite with Matchers with BeforeAndAfter
   val vanillaJsonSchemaDraft4WithIds = JsonSchemaConfig.vanillaJsonSchemaDraft4.copy(useTypeIdForDefinitionName = true)
   val jsonSchemaGeneratorWithIds = new JsonSchemaGenerator(_objectMapperScala, debug = true, vanillaJsonSchemaDraft4WithIds)
 
+  val configWithAlwaysReturnDefinitions = JsonSchemaConfig.vanillaJsonSchemaDraft4.copy(alwaysReturnDefinitions = true)
+  val jsonSchemaGeneratorWithAlwaysReturnDefinitions = new JsonSchemaGenerator(_objectMapperScala, debug = true, configWithAlwaysReturnDefinitions)
+
   val jsonSchemaGeneratorNullable = new JsonSchemaGenerator(_objectMapper, debug = true, config = JsonSchemaConfig.nullableJsonSchemaDraft4)
   val jsonSchemaGeneratorHTML5Nullable = new JsonSchemaGenerator(_objectMapper, debug = true,
     config = JsonSchemaConfig.html5EnabledSchema.copy(useOneOfForNullables = true))
@@ -844,41 +847,37 @@ class JsonSchemaGeneratorTest extends FunSuite with Matchers with BeforeAndAfter
     assert(schema.at("/properties/listOfListOfStrings/oneOf/1/items/items/type").asText() == "string")
   }
 
+  test("recursivePojo") {
+    val jsonNode = assertToFromJson(jsonSchemaGenerator, testData.recursivePojo)
+    val schema = generateAndValidateSchema(jsonSchemaGenerator, testData.recursivePojo.getClass, Some(jsonNode))
+
+    assert(schema.at("/properties/myText/type").asText() == "string")
+
+    assert(schema.at("/properties/children/type").asText() == "array")
+    val defViaRef = getNodeViaRefs(schema, schema.at("/properties/children/items"), "RecursivePojo")
+
+    assert(defViaRef.at("/properties/myText/type").asText() == "string")
+    assert(defViaRef.at("/properties/children/type").asText() == "array")
+    val defViaRef2 = getNodeViaRefs(schema, defViaRef.at("/properties/children/items"), "RecursivePojo")
+
+    assert(defViaRef == defViaRef2)
+  }
+
   // TODO: Disabled test because of changes to how `required` is set on properties
-  ignore("recursivePojo") {
-    // Non-nullable Java types
-    {
-      val jsonNode = assertToFromJson(jsonSchemaGenerator, testData.recursivePojo)
-      val schema = generateAndValidateSchema(jsonSchemaGenerator, testData.recursivePojo.getClass, Some(jsonNode))
+  ignore("recursivePojoNullable") {
+    val jsonNode = assertToFromJson(jsonSchemaGeneratorNullable, testData.recursivePojo)
+    val schema = generateAndValidateSchema(jsonSchemaGeneratorNullable, testData.recursivePojo.getClass, Some(jsonNode))
 
-      assert(schema.at("/properties/myText/type").asText() == "string")
+    assertNullableType(schema, "/properties/myText", "string")
 
-      assert(schema.at("/properties/children/type").asText() == "array")
-      val defViaRef = getNodeViaRefs(schema, schema.at("/properties/children/items"), "RecursivePojo")
+    assertNullableType(schema, "/properties/children", "array")
+    val defViaRef = getNodeViaRefs(schema, schema.at("/properties/children/oneOf/1/items"), "RecursivePojo")
 
-      assert(defViaRef.at("/properties/myText/type").asText() == "string")
-      assert(defViaRef.at("/properties/children/type").asText() == "array")
-      val defViaRef2 = getNodeViaRefs(schema, defViaRef.at("/properties/children/items"), "RecursivePojo")
+    assertNullableType(defViaRef, "/properties/myText", "string")
+    assertNullableType(defViaRef, "/properties/children", "array")
+    val defViaRef2 = getNodeViaRefs(schema, defViaRef.at("/properties/children/oneOf/1/items"), "RecursivePojo")
 
-      assert(defViaRef == defViaRef2)
-    }
-
-    // Nullable Java types
-    {
-      val jsonNode = assertToFromJson(jsonSchemaGeneratorNullable, testData.recursivePojo)
-      val schema = generateAndValidateSchema(jsonSchemaGeneratorNullable, testData.recursivePojo.getClass, Some(jsonNode))
-
-      assertNullableType(schema, "/properties/myText", "string")
-
-      assertNullableType(schema, "/properties/children", "array")
-      val defViaRef = getNodeViaRefs(schema, schema.at("/properties/children/oneOf/1/items"), "RecursivePojo")
-
-      assertNullableType(defViaRef, "/properties/myText", "string")
-      assertNullableType(defViaRef, "/properties/children", "array")
-      val defViaRef2 = getNodeViaRefs(schema, defViaRef.at("/properties/children/oneOf/1/items"), "RecursivePojo")
-
-      assert(defViaRef == defViaRef2)
-    }
+    assert(defViaRef == defViaRef2)
   }
 
   test("pojo using Maps") {
@@ -1281,6 +1280,77 @@ class JsonSchemaGeneratorTest extends FunSuite with Matchers with BeforeAndAfter
     generateAndValidateSchema(jsonSchemaGeneratorScala, classOf[NestedPolymorphism1Base], Some(jsonNode))
   }
 
+  test("SameNameNested") {
+    val schema = jsonSchemaGeneratorScala.generateJsonSchema(classOf[SameNameNestedParent])
+    val definitions = schema.at("/definitions").fieldNames.asScala.toList
+
+    assert(definitions.contains("Row"))
+    assert(definitions.contains("Column"))
+    assert(definitions.contains("Module"))
+    assert(definitions.contains("Package1Brand"))
+    assert(schema.at("/definitions/Row/properties/brand/$ref").asText() == "#/definitions/Package1Brand")
+    assert(schema.at("/definitions/Column/properties/brand/$ref").asText() == "#/definitions/Package1Brand")
+    assert(schema.at("/definitions/Module/properties/brand/$ref").asText() == "#/definitions/Package1Brand")
+
+    assert(definitions.contains("Row_1"))
+    assert(definitions.contains("Column_1"))
+    assert(definitions.contains("Module_1"))
+    assert(definitions.contains("Package2Brand"))
+    assert(schema.at("/definitions/Row_1/properties/brand/$ref").asText() == "#/definitions/Package2Brand")
+    assert(schema.at("/definitions/Column_1/properties/brand/$ref").asText() == "#/definitions/Package2Brand")
+    assert(schema.at("/definitions/Module_1/properties/brand/$ref").asText() == "#/definitions/Package2Brand")
+
+    assert(definitions.length == 8)
+  }
+
+  test("SameNameNestedWithAlwaysReturnDefinitions") {
+    val schema = jsonSchemaGeneratorWithAlwaysReturnDefinitions.generateJsonSchema(classOf[SameNameNestedParent])
+    val definitions = schema.at("/definitions").fieldNames.asScala.toList
+
+    assert(definitions.contains("Row"))
+    assert(definitions.contains("Column"))
+    assert(definitions.contains("Module"))
+    assert(definitions.contains("Package1Brand"))
+    assert(schema.at("/definitions/Row/properties/brand/$ref").asText() == "#/definitions/Package1Brand")
+    assert(schema.at("/definitions/Column/properties/brand/$ref").asText() == "#/definitions/Package1Brand")
+    assert(schema.at("/definitions/Module/properties/brand/$ref").asText() == "#/definitions/Package1Brand")
+
+    assert(definitions.contains("Row_1"))
+    assert(definitions.contains("Column_1"))
+    assert(definitions.contains("Module_1"))
+    assert(definitions.contains("Package2Brand"))
+    assert(schema.at("/definitions/Row_1/properties/brand/$ref").asText() == "#/definitions/Package2Brand")
+    assert(schema.at("/definitions/Column_1/properties/brand/$ref").asText() == "#/definitions/Package2Brand")
+    assert(schema.at("/definitions/Module_1/properties/brand/$ref").asText() == "#/definitions/Package2Brand")
+
+    assert(definitions.length == 8)
+  }
+
+  test("RecursiveNestedPolymorphism") {
+    val jsonNode = assertToFromJson(jsonSchemaGeneratorScala, testData.recursiveNestedPolymorphism)
+    assertToFromJson(jsonSchemaGeneratorScala, testData.recursiveNestedPolymorphism, classOf[Column])
+
+    generateAndValidateSchema(jsonSchemaGeneratorScala, classOf[Column], Some(jsonNode))
+  }
+
+  test("RecursiveNestedPolymorphismDefinitions") {
+    val schema = jsonSchemaGeneratorScala.generateJsonSchema(classOf[Column])
+    val definitions = schema.at("/definitions").fieldNames.asScala.toList
+    assert(definitions.contains("Row"))
+    assert(definitions.contains("Column"))
+    assert(definitions.contains("Module"))
+    assert(definitions.length == 3)
+  }
+
+  test("RecursiveNestedPolymorphismWithAlwaysReturnDefinitions") {
+    val schema = jsonSchemaGeneratorWithAlwaysReturnDefinitions.generateJsonSchema(classOf[Column])
+    val definitions = schema.at("/definitions").fieldNames.asScala.toList
+    assert(definitions.contains("Row"))
+    assert(definitions.contains("Column"))
+    assert(definitions.contains("Module"))
+    assert(definitions.length == 3)
+  }
+
   test("PolymorphismAndTitle") {
     val schema = jsonSchemaGeneratorScala.generateJsonSchema(classOf[PolymorphismAndTitleBase])
 
@@ -1663,6 +1733,7 @@ trait TestData {
   val notNullableButNullBoolean = new PojoWithNotNull(null)
 
   val nestedPolymorphism = NestedPolymorphism1_1("a1", NestedPolymorphism2_2("a2", Some(NestedPolymorphism3("b3"))))
+  val recursiveNestedPolymorphism = Column(List(Row(List(Column(List()), Module("data")))))
 
   val genericClassVoid = new GenericClassVoid()
 

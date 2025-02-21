@@ -402,15 +402,19 @@ class JsonSchemaGenerator
       definitionName
     }
 
+    def toShortRef (longRef:String):String = {
+      longRef.stripPrefix("#/definitions/")
+    }
+
     // Either creates new definitions or return $ref to existing one
     def getOrCreateDefinition(clazz:JavaType)(objectDefinitionBuilder:(ObjectNode) => Option[JsonObjectFormatVisitor]):DefinitionInfo = {
 
       class2Ref.get(clazz) match {
         case Some(ref) =>
 
+          val shortRef = toShortRef(ref)
           workInProgress match {
             case None =>
-              val shortRef = getDefinitionName(clazz)
               if (config.alwaysReturnDefinitions) {
                 globalDefinitionsTracker.get(shortRef)
                   .map(definition => definitionsNode.set(shortRef, definition))
@@ -421,7 +425,9 @@ class JsonSchemaGenerator
               // this is a recursive polymorphism call
               if ( clazz.getRawClass != w.classInProgress) throw new Exception(s"Wrong class - working on ${w.classInProgress} - got $clazz")
 
-              definitionsNode.set(ref, w.nodeInProgress)
+              if (config.alwaysReturnDefinitions) {
+                definitionsNode.set(shortRef, w.nodeInProgress)
+              }
               DefinitionInfo(None, objectDefinitionBuilder(w.nodeInProgress))
           }
 

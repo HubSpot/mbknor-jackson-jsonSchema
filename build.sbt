@@ -48,7 +48,7 @@ lazy val deps  = Seq(
   "org.slf4j" % "slf4j-api" % slf4jVersion,
   "io.swagger" % "swagger-annotations" % swaggerApiVersion,
   "io.github.classgraph" % "classgraph" % "4.8.22",
-  "com.google.guava" % "guava" % "25.0-jre", 
+  "com.google.guava" % "guava" % "25.0-jre",
   "org.scalatest" %% "scalatest" % "3.0.7" % "test",
   "ch.qos.logback" % "logback-classic" % "1.2.3" % "test",
   "com.github.java-json-tools" % "json-schema-validator" % "2.2.10" % "test",
