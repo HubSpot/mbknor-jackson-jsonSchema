@@ -4,7 +4,7 @@ import java.util
 import java.util.function.Supplier
 import java.util.{Optional, OptionalDouble, OptionalInt, OptionalLong, List => JList}
 
-import com.fasterxml.jackson.annotation.{JsonInclude, JsonPropertyDescription, JsonSubTypes, JsonTypeInfo}
+import com.fasterxml.jackson.annotation.{JsonInclude, JsonClassDescription, JsonPropertyDescription, JsonSubTypes, JsonTypeInfo}
 import com.fasterxml.jackson.core.JsonParser.NumberType
 import com.fasterxml.jackson.databind._
 import com.fasterxml.jackson.databind.annotation.{JsonDeserialize, JsonSerialize}
@@ -1002,7 +1002,7 @@ class JsonSchemaGenerator
 
             // If class is annotated with JsonSchemaDescription, we should add it
             Option(ac.getAnnotations.get(classOf[JsonSchemaDescription])).map(_.value())
-              .orElse(Option(ac.getAnnotations.get(classOf[JsonPropertyDescription])).map(_.value))
+              .orElse(Option(ac.getAnnotations.get(classOf[JsonClassDescription])).map(_.value))
               .foreach {
                 description: String =>
                   thisObjectNode.put("description", description)
