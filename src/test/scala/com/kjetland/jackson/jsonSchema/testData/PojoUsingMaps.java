@@ -1,9 +1,11 @@
 package com.kjetland.jackson.jsonSchema.testData;
 
+import com.fasterxml.jackson.annotation.JsonClassDescription;
 import com.kjetland.jackson.jsonSchema.testData.polymorphism1.Parent;
 
 import java.util.Map;
 
+@JsonClassDescription("This is our pojo")
 public class PojoUsingMaps {
 
     public Map<String, Integer> string2Integer;

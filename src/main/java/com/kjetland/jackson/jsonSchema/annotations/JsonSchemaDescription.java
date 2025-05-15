@@ -7,7 +7,7 @@ import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Same as com.fasterxml.jackson.annotation.JsonPropertyDescription
+ * Same as com.fasterxml.jackson.annotation.JsonPropertyDescription or com.fasterxml.jackson.annotation.JsonClassDescription
  */
 @Target({ METHOD, FIELD, PARAMETER, TYPE })
 @Retention(RUNTIME)
