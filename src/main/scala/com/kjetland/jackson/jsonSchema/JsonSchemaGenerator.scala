@@ -1002,6 +1002,7 @@ class JsonSchemaGenerator
 
             // If class is annotated with JsonSchemaDescription, we should add it
             Option(ac.getAnnotations.get(classOf[JsonSchemaDescription])).map(_.value())
+              .orElse(Option(ac.getAnnotations.get(classOf[JsonPropertyDescription])).map(_.value))
               .orElse(Option(ac.getAnnotations.get(classOf[JsonClassDescription])).map(_.value))
               .foreach {
                 description: String =>
