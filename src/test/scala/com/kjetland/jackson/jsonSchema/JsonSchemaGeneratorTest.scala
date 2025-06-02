@@ -887,6 +887,8 @@ class JsonSchemaGeneratorTest extends FunSuite with Matchers with BeforeAndAfter
       val jsonNode = assertToFromJson(jsonSchemaGenerator, testData.pojoUsingMaps)
       val schema = generateAndValidateSchema(jsonSchemaGenerator, testData.pojoUsingMaps.getClass, Some(jsonNode))
 
+      assert(schema.at("/description").asText() == "This is our pojo")
+
       assert(schema.at("/properties/string2Integer/type").asText() == "object")
       assert(schema.at("/properties/string2Integer/additionalProperties/type").asText() == "integer")
 
@@ -902,6 +904,8 @@ class JsonSchemaGeneratorTest extends FunSuite with Matchers with BeforeAndAfter
     {
       val jsonNode = assertToFromJson(jsonSchemaGeneratorNullable, testData.pojoUsingMaps)
       val schema = generateAndValidateSchema(jsonSchemaGeneratorNullable, testData.pojoUsingMaps.getClass, Some(jsonNode))
+
+      assert(schema.at("/description").asText() == "This is our pojo")
 
       assert(schema.at("/properties/string2Integer/type").asText() == "object")
       assert(schema.at("/properties/string2Integer/additionalProperties/type").asText() == "integer")
