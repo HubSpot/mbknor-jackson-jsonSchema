@@ -41,7 +41,7 @@ before:
   - description: "Move artifacts to upload directory"
     commands:
       - |
-        project_version="$(sbt -warn --batch --no-colors 'print version')"
+        project_version="$($SBT_BIN/sbt -warn --batch --no-colors 'print version')"
         for i in $(find target -name "scala-2.1*")
         do
             scala_dir="$(basename $i)"
