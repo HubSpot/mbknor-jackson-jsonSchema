@@ -15,6 +15,7 @@ env:
   SBT_BIN: "${HOME_BIN}/sbt/bin"
   PROJECT_VERSION: ""
   PUBLISH_DIR: ""
+  SET_VERSION_OVERRIDE: "1.0-$GIT_BRANCH-SNAPSHOT"
 
 stepActivation:
   uploadAndNotify:
