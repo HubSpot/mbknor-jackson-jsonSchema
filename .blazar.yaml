@@ -1,5 +1,6 @@
 buildpack:
   name: Blazar-Buildpack-Java-prebuilt
+  branch: js-prebuilt-java21
 
 buildResources:
   memoryMb: 4096
