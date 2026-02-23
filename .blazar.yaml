@@ -46,7 +46,7 @@ before:
         do
             scala_dir="$(basename $i)"
             scala_version="${scala_dir#scala-}"
-            artifact_dir="mbknor-jackson-jsonschema_$scala_version-$project_version"
+            artifact_dir="mbknor-jackson-jsonschema_$scala_version-$(echo $project_version | sed -n 's/^\([[:digit:]]*\.[[:digit:]]*\)-.*$/\1/p')"
             mkdir $artifact_dir
             find $i -maxdepth 1 -name "*-$project_version-javadoc.jar" -exec cp {} "$artifact_dir/javadoc.jar" \;
             find $i -maxdepth 1 -name "*-$project_version-sources.jar" -exec cp {} "$artifact_dir/sources.jar" \;
