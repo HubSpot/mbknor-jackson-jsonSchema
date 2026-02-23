@@ -37,18 +37,20 @@ before:
 
   - description: "Package + Publish Local"
     commands:
-      - $SBT_BIN/sbt publish
+      - $SBT_BIN/sbt +publish
 
   - description: "Move artifacts to upload directory"
     commands:
-      - write-build-env-var PROJECT_VERSION "$($SBT_BIN/sbt -warn --batch --no-colors 'print version')"
-      - write-build-env-var PUBLISH_DIR "$PUBLISH_DIR_WITHOUT_VERSION-$(echo $PROJECT_VERSION | sed -n 's/^\([[:digit:]]*\.[[:digit:]]*\)-.*$/\1/p')"
-      - mkdir $PUBLISH_DIR
-      - find target/scala-2.13 -maxdepth 1 -type f | xargs -I {} cp {} $PUBLISH_DIR
-      - mv $PUBLISH_DIR/"$PROJECT_NAME"_2.13-"$PROJECT_VERSION".pom $PUBLISH_DIR/pom.xml
-      - mv $PUBLISH_DIR/"$PROJECT_NAME"_2.13-"$PROJECT_VERSION".jar $PUBLISH_DIR/main.jar
-      - mv $PUBLISH_DIR/"$PROJECT_NAME"_2.13-"$PROJECT_VERSION"-sources.jar $PUBLISH_DIR/sources.jar
-      - mv $PUBLISH_DIR/"$PROJECT_NAME"_2.13-"$PROJECT_VERSION"-javadoc.jar $PUBLISH_DIR/javadoc.jar
+      - |
+        for i in $(find target -name "scala-2.1*")
+        do
+          scala_dir="$(basename $i)"
+          mkdir $scala_dir
+          mv "$i/*-javadoc.jar" "$scala_dir/javadoc.jar"
+          mv "$i/*-sources.jar" "$scala_dir/sources.jar"
+          mv "$i/*.jar" "$scala_dir/main.jar"
+          mv "$i/*.pom" "$scala_dir/pom.xml"
+        done
 
   - name: uploadAndNotify
     description: "Notifying deploy service"
