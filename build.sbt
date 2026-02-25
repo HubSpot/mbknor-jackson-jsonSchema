@@ -2,7 +2,7 @@ lazy val commonSettings = Seq(
   organization := "com.kjetland",
   organizationName := "mbknor",
   scalaVersion := "2.13.16",
-  crossScalaVersions := Seq("2.10.7", "2.11.12", "2.12.8", "2.13.16"),
+  crossScalaVersions := Seq("2.11.12", "2.12.18", "2.13.16"),
   publishMavenStyle := true,
   publishArtifact in Test := false,
   pomIncludeRepository := { _ => false },
@@ -25,7 +25,7 @@ lazy val commonSettings = Seq(
     )
   ),
   compileOrder in Test := CompileOrder.Mixed,
-  javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
+  javacOptions ++= Seq("-source", "11", "-target", "11"),
   scalacOptions ++= Seq("-unchecked", "-deprecation"),
   scalacOptions in(Compile, doc) ++= Seq(scalaVersion.value).flatMap {
     case v if v.startsWith("2.12") =>
@@ -36,8 +36,8 @@ lazy val commonSettings = Seq(
 )
 
 
-val jacksonVersion = "2.9.9"
-val jacksonModuleScalaVersion = "2.9.9"
+val jacksonVersion = "2.21.1"
+val jacksonModuleScalaVersion = "2.21.1"
 val slf4jVersion = "1.7.26"
 val swaggerApiVersion = "1.5.13"
 
@@ -47,8 +47,8 @@ lazy val deps  = Seq(
   "javax.validation" % "validation-api" % "2.0.1.Final",
   "org.slf4j" % "slf4j-api" % slf4jVersion,
   "io.swagger" % "swagger-annotations" % swaggerApiVersion,
-  "io.github.classgraph" % "classgraph" % "4.8.22",
-  "com.google.guava" % "guava" % "25.0-jre", 
+  "io.github.classgraph" % "classgraph" % "4.8.181",
+  "com.google.guava" % "guava" % "33.5.0-jre",
   "org.scalatest" %% "scalatest" % "3.0.8" % "test",
   "ch.qos.logback" % "logback-classic" % "1.2.3" % "test",
   "com.github.java-json-tools" % "json-schema-validator" % "2.2.10" % "test",

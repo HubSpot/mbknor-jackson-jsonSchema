@@ -1,14 +1,10 @@
 package com.kjetland.jackson.jsonSchema
 
-import java.util
-import java.util.function.Supplier
-import java.util.{Optional, OptionalDouble, OptionalInt, OptionalLong, List => JList}
-
-import com.fasterxml.jackson.annotation.{JsonInclude, JsonClassDescription, JsonPropertyDescription, JsonSubTypes, JsonTypeInfo}
+import com.fasterxml.jackson.annotation._
 import com.fasterxml.jackson.core.JsonParser.NumberType
 import com.fasterxml.jackson.databind._
 import com.fasterxml.jackson.databind.annotation.{JsonDeserialize, JsonSerialize}
-import com.fasterxml.jackson.databind.introspect.AnnotatedClass
+import com.fasterxml.jackson.databind.introspect.{AnnotatedClass, AnnotatedClassResolver}
 import com.fasterxml.jackson.databind.jsonFormatVisitors._
 import com.fasterxml.jackson.databind.jsontype.impl.MinimalClassNameIdResolver
 import com.fasterxml.jackson.databind.node.{ArrayNode, JsonNodeFactory, ObjectNode}
@@ -17,8 +13,12 @@ import com.fasterxml.jackson.databind.util.ClassUtil
 import com.kjetland.jackson.jsonSchema.annotations._
 import io.github.classgraph.{ClassGraph, ScanResult}
 import io.swagger.annotations.ApiModelProperty
-import javax.validation.constraints._
 import org.slf4j.LoggerFactory
+
+import java.util
+import java.util.function.Supplier
+import java.util.{Optional, OptionalDouble, OptionalInt, OptionalLong, List => JList}
+import javax.validation.constraints._
 
 
 object JsonSchemaGenerator {
@@ -861,7 +861,7 @@ class JsonSchemaGenerator
 
     private def extractSubTypes(_type: JavaType):List[Class[_]] = {
 
-      val ac = AnnotatedClass.construct(_type, objectMapper.getDeserializationConfig)
+      val ac = AnnotatedClassResolver.resolve(objectMapper.getDeserializationConfig, _type, objectMapper.getDeserializationConfig)
 
       Option(ac.getAnnotation(classOf[JsonTypeInfo])).map {
         jsonTypeInfo: JsonTypeInfo =>
@@ -994,7 +994,7 @@ class JsonSchemaGenerator
             thisObjectNode.put("additionalProperties", !config.failOnUnknownProperties)
 
             // If class is annotated with JsonSchemaFormat, we should add it
-            val ac = AnnotatedClass.construct(_type, objectMapper.getDeserializationConfig)
+            val ac = AnnotatedClassResolver.resolve(objectMapper.getDeserializationConfig, _type, objectMapper.getDeserializationConfig)
             resolvePropertyFormat(_type, objectMapper).foreach {
               format =>
                 setFormat(thisObjectNode, format)
@@ -1074,6 +1074,7 @@ class JsonSchemaGenerator
                   val objectOptionsNode = JsonNodeFactory.instance.objectNode()
                   objectOptionsNode.set("multiple_editor_select_via_property", multipleEditorSelectViaPropertyNode)
                   thisObjectNode.set("options", objectOptionsNode)
+                  ()
                 }
 
             }
@@ -1362,6 +1363,7 @@ class JsonSchemaGenerator
             // Overwrite field
             val value = updateNode.get(fieldName)
             node.set(fieldName, value)
+            ()
           case _ =>
         }
       }
@@ -1385,7 +1387,7 @@ class JsonSchemaGenerator
   }
 
   def resolvePropertyFormat(_type: JavaType, objectMapper:ObjectMapper):Option[String] = {
-    val ac = AnnotatedClass.construct(_type, objectMapper.getDeserializationConfig)
+    val ac = AnnotatedClassResolver.resolve(objectMapper.getDeserializationConfig, _type, objectMapper.getDeserializationConfig)
     resolvePropertyFormat(Option(ac.getAnnotation(classOf[JsonSchemaFormat])), _type.getRawClass.getName)
   }
 
@@ -1493,8 +1495,9 @@ class JsonSchemaGenerator
 
     rootObjectMapper.acceptJsonFormatVisitor(javaType, rootVisitor)
 
-    handlerToUse.getFinalDefinitionsNode().foreach {
-      definitionsNode => rootNode.set("definitions", definitionsNode)
+    handlerToUse.getFinalDefinitionsNode().foreach { definitionsNode =>
+      rootNode.set("definitions", definitionsNode)
+      ()
     }
 
     if (javaType != null) {
