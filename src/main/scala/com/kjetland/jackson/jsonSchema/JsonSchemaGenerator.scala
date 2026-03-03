@@ -793,11 +793,14 @@ class JsonSchemaGenerator
         }
       }
 
-      definitionsHandler.pushWorkInProgress()
+      if (!_type.getContentType.hasRawClass(classOf[java.lang.Object])) {
+        definitionsHandler.pushWorkInProgress()
 
-      val childVisitor = createChild(additionalPropsObject, None)
-      objectMapper.acceptJsonFormatVisitor(tryToReMapType(_type.getContentType), childVisitor)
-      definitionsHandler.popworkInProgress()
+        val childVisitor = createChild(additionalPropsObject, None)
+        objectMapper.acceptJsonFormatVisitor(tryToReMapType(_type.getContentType), childVisitor)
+
+        definitionsHandler.popworkInProgress()
+      }
 
       if (_type != null) {
         config.schemaExtension.modifyProperty(node, _type.getRawClass, Optional.ofNullable(currentProperty.orNull))
