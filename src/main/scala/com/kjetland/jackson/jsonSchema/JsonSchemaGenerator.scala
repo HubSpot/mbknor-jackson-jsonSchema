@@ -413,7 +413,7 @@ class JsonSchemaGenerator
               val shortRef = getDefinitionName(clazz)
               if (config.alwaysReturnDefinitions) {
                 globalDefinitionsTracker.get(shortRef)
-                  .map(definition => definitionsNode.set(shortRef, definition))
+                  .foreach(definition => definitionsNode.set(shortRef, definition))
               }
               DefinitionInfo(Some(ref), None)
 
